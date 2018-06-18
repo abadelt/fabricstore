@@ -1,0 +1,25 @@
+image: openjdk:8-jdk-alpine:latest
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+
+stages:
+  - build
+  - package
+  - deploy
+
+gradle-build:
+  image: gradle:4.8
+  stage: build
+  script: "./gradlew -x test"
+
+docker-build:
+  stage: package
+  script:
+  - docker build -t registry.gitlab.com/Badelt/fabricstore .
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+  - docker push registry.gitlab.com/Badelt/fabricstore
+
