@@ -1,0 +1,32 @@
+<!doctype html>
+<html ng-app="templatesApp">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="templates.js"></script>
+</head>
+<body>
+<div ng-controller="TemplatesListController as templatesList">
+    <h1>Templates</h1>
+
+    <section style="display: table; width: 80%">
+        <header style="display: table-row;">
+            <div style="display: table-cell;">Template Name</div>
+            <div style="display: table-cell;">Description</div>
+            <div style="display: table-cell;">Created</div>
+            <div style="display: table-cell;">Mime Type</div>
+        </header>
+        <div style="display: table-row;" ng-repeat="template in templatesList.templates">
+            <div style="display: table-cell;"><a href="{{templatesList.getHref(template)}}" type={{template.mimeType}} download={{template.fileName}}>{{template.fileName}}</a></div>
+            <div style="display: table-cell;"><label>{{template.description}}</label></div>
+            <div style="display: table-cell;"><label>{{template.created}}</label></div>
+            <div style="display: table-cell;"><label>{{template.mimeType}}</label></div>
+        </div>
+    </section>
+
+    <h2>Add Template File</h2>
+    <input type="file" id="template" name="template"/>
+    <input type="text" id="description" name="description" ng-model="templatesList.description" placeholder="Description"/>
+    <button ng-click="templatesList.upload()">Upload</button>
+</div>
+</body>
+</html>
