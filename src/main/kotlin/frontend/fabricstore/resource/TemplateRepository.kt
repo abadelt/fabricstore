@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.rest.core.annotation.RepositoryRestResource
 
 @RepositoryRestResource(path="templates", collectionResourceRel="templates")
-interface FileRepository : JpaRepository<Template, Long> {
+interface TemplateRepository : JpaRepository<Template, Long> {
 }

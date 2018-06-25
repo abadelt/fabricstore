@@ -1,11 +1,10 @@
 <!doctype html>
 <html ng-app="templatesApp">
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-    <script src="templates.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div ng-controller="TemplatesListController as templatesList">
+<div class="template-admin" ng-controller="TemplatesListController as templatesList">
     <h1>Templates</h1>
 
     <section style="display: table; width: 80%">
@@ -28,5 +27,8 @@
     <input type="text" id="description" name="description" ng-model="templatesList.description" placeholder="Description"/>
     <button ng-click="templatesList.upload()">Upload</button>
 </div>
+
+<script src="js/bundle.js"></script>
+
 </body>
 </html>

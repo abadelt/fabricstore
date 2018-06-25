@@ -5,5 +5,5 @@ import org.springframework.content.commons.repository.ContentStore
 import org.springframework.content.rest.StoreRestResource
 
 @StoreRestResource
-interface FileContentStore : ContentStore<Template, String> {
+interface TemplateFileStore : ContentStore<Template, String> {
 }

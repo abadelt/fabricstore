@@ -1,3 +1,5 @@
+require('./angular.min.js');
+
 angular.module('templatesApp', [])
     .controller('TemplatesListController', function($http) {
         var templatesList = this;
