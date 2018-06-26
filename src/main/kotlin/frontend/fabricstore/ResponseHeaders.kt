@@ -15,7 +15,7 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 @Component
 class ResponseHeaderFilter : Filter {
 
-    val LINK_HEADER_VALUE : String = """`<http://localhost:8081/styles.css>;rel="stylesheet",<http://localhost:8081/js/bundle.js>;rel="fragment-script"`"""
+    val LINK_HEADER_VALUE : String = """`<http://localhost:8082/styles.css>;rel="stylesheet",<http://localhost:8082/js/bundle.js>;rel="fragment-script"`"""
     val ADMIN_PAGE_PATH : String = "/admin.html"
 
     override fun doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain?) {
