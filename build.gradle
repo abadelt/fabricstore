@@ -1,3 +1,7 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+println System.getenv('MYSQL_PASSWORD')
+
 buildscript {
 	ext {
 		kotlinVersion = '1.2.41'
@@ -43,6 +47,21 @@ repositories {
 	mavenCentral()
 }
 
+def mysqlDbHost = System.getenv('MYSQL_DB_HOST') ?: 'mysql'
+def mysqlDbPort = System.getenv('MYSQL_DB_PORT') ?: '3306'
+def mysqlDbName = System.getenv('MYSQL_DB_NAME') ?: 'mysqldb'
+def mysqlUser = System.getenv('MYSQL_USER') ?: 'mysql'
+def mysqlPassword = System.getenv('MYSQL_PASSWORD') ?: 'mysql'
+
+processResources {
+    filter(ReplaceTokens, tokens:[
+            'MYSQL_DB_HOST': mysqlDbHost,
+            'MYSQL_DB_PORT': mysqlDbPort,
+            'MYSQL_DB_NAME': mysqlDbName,
+            'MYSQL_USER': mysqlUser,
+            'MYSQL_PASSWORD': mysqlPassword
+    ])
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
