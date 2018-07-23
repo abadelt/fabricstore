@@ -1,37 +1,52 @@
-apiVersion: v1
+apiVersion: template.openshift.io/v1
 kind: Template
+labels:
+  template: fabricstore-template
+message: |-
+  The following service(s) have been created in your project: ${FABRICSTORE_SERVICE_NAME}.
+
+  Fabricstore is a template repository service that can be used with Zalando's Tailor service (see http://mosaic9.org).
+  It offers a REST API (<SERVICE_URL>/templates), and a simple web UI (<SERVICE_URL>/admin.html).
 metadata:
-  name: tailor
+  annotations:
+    description: |-
+      Fabricstore is a template repository service that can be used with Zalando's Tailor service (see http://mosaic9.org).
+      It offers a REST API (<SERVICE_URL>/templates), and a simple web UI (<SERVICE_URL>/admin.html).
+    iconClass: icon-openjdk
+    openshift.io/display-name: Fabricstore
+    openshift.io/documentation-url: https://github.com/abadelt/fabricstore/
+    openshift.io/long-description:
+    openshift.io/provider-display-name:
+    openshift.io/support-url:
+    tags: mosaic9,tailor,fabricstore
+  name: fabricstore
 objects:
 
 - kind: ImageStream
-  apiVersion: image.openshift.io/v1
+  apiVersion: v1
   metadata:
-    generation: 1
-    labels:
-      app: fabricstore1
-    name: fabricstore1
-    namespace: frontend-sandbox
+    name: fabricstore
+    annotations:
+      openshift.io/display-name: fabricstore
   spec:
-    lookupPolicy:
-      local: false
+  tags:
+  - name: '1.0'
+    annotations:
+      openshift.io/display-name: fabricstore 2.0
+      description: >-
+        Build and run Fabricstore applications on CentOS 7.
+      iconClass: icon-openjdk
+      tags: 'builder,java,fabricstore'
+      supports: 'java'
+      version: '1.0'
 
 - kind: BuildConfig
   apiVersion: v1
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
     labels:
-      app: fabricstore1
-    name: fabricstore1
+      app: ${FABRICSTORE_SERVICE_NAME}
+    name: ${FABRICSTORE_SERVICE_NAME}
   spec:
-    failedBuildsHistoryLimit: 5
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: fabricstore1:latest
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -46,36 +61,27 @@ objects:
           name: s2i-java:latest
           namespace: frontend-sandbox
       type: Source
-    successfulBuildsHistoryLimit: 5
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${FABRICSTORE_SERVICE_NAME}:latest
     triggers:
-    - github:
-        secret: A02po7DhTnsN1pB9KhvM
-      type: GitHub
-    - generic:
-        secret: 8Lihq6jgNBi7CitwDBkl
-      type: Generic
     - type: ConfigChange
     - imageChange: {}
       type: ImageChange
-  status:
-    lastVersion: 0
 
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    generation: 1
     labels:
-      app: fabricstore1
-    name: fabricstore1
+      app: ${FABRICSTORE_SERVICE_NAME}
+    name: ${FABRICSTORE_SERVICE_NAME}
   spec:
     replicas: 1
     revisionHistoryLimit: 10
     selector:
-      app: fabricstore1
-      deploymentconfig: fabricstore1
+      app: ${FABRICSTORE_SERVICE_NAME}
+      deploymentconfig: ${FABRICSTORE_SERVICE_NAME}
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -92,33 +98,33 @@ objects:
           openshift.io/generated-by: OpenShiftNewApp
         creationTimestamp: null
         labels:
-          app: fabricstore1
-          deploymentconfig: fabricstore1
+          app: ${FABRICSTORE_SERVICE_NAME}
+          deploymentconfig: ${FABRICSTORE_SERVICE_NAME}
       spec:
         containers:
         - env:
           - name: MYSQL_DB_NAME
-            value: mysqldb
-          - name: MYSQL_USER
             valueFrom:
               secretKeyRef:
                 key: database-name
-                name: mysql
+                name: ${MYSQL_SERVICE_NAME}
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: ${MYSQL_SERVICE_NAME}
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: database-password
-                name: mysql
+                name: ${MYSQL_SERVICE_NAME}
           - name: MYSQL_DB_HOST
-            value: mysql
+            value: ${MYSQL_SERVICE_NAME}
           - name: MYSQL_DB_PORT
-            value: "3306"
-          envFrom:
-          - secretRef:
-              name: mysql
-          image: docker-registry.default.svc:5000/frontend-sandbox/fabricstore1@sha256:a75fc474df639ae08a997a5e42cb3de25ce39dadd47d9b13e258fbeae55d107a
+            value: ${MYSQL_DB_PORT}
+          image: docker-registry.default.svc:5000/${PROJECT}/${FABRICSTORE_SERVICE_NAME}
           imagePullPolicy: Always
-          name: fabricstore1
+          name: ${FABRICSTORE_SERVICE_NAME}
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -136,29 +142,19 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - fabricstore1
+        - ${FABRICSTORE_SERVICE_NAME}
         from:
           kind: ImageStreamTag
-          name: fabricstore1:latest
+          name: ${FABRICSTORE_SERVICE_NAME}:latest
           namespace: frontend-sandbox
       type: ImageChange
-  status:
-    availableReplicas: 0
-    latestVersion: 0
-    observedGeneration: 0
-    replicas: 0
-    unavailableReplicas: 0
-    updatedReplicas: 0
 
 - kind: Service
   apiVersion: v1
   metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
     labels:
-      app: fabricstore1
-    name: fabricstore1
+      app: ${FABRICSTORE_SERVICE_NAME}
+    name: ${FABRICSTORE_SERVICE_NAME}
   spec:
     ports:
     - name: ${PORT}-tcp
@@ -166,50 +162,45 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      app: fabricstore1
-      deploymentconfig: fabricstore1
+      app: ${FABRICSTORE_SERVICE_NAME}
+      deploymentconfig: ${FABRICSTORE_SERVICE_NAME}
     sessionAffinity: None
     type: ClusterIP
-  status:
-    loadBalancer: {}
 
 - kind: Route
   apiVersion: v1
   metadata:
-    annotations:
-      openshift.io/host.generated: "true"
-    creationTimestamp: null
     labels:
-      app: fabricstore1
-    name: fabricstore1
+      app: ${FABRICSTORE_SERVICE_NAME}
+    name: ${FABRICSTORE_SERVICE_NAME}
   spec:
-    host: fabricstore1-frontend-sandbox.apps.badelt.it
+    host: ${FABRICSTORE_SERVICE_NAME}-frontend-sandbox.apps.badelt.it
     port:
       targetPort: ${PORT}-tcp
     to:
       kind: Service
-      name: fabricstore1
+      name: ${FABRICSTORE_SERVICE_NAME}
       weight: 100
     wildcardPolicy: None
-  status:
-    ingress:
-    - conditions:
-      - lastTransitionTime: 2018-07-19T16:25:23Z
-        status: "True"
-        type: Admitted
-      host: fabricstore1-frontend-sandbox.apps.badelt.it
-      routerName: router
-      wildcardPolicy: None
 
 parameters:
 - name: PROJECT
   displayName: Project (= namespace) name
   description: Name of the project in which the created resources and referenced ImageStreams reside.
   value: myproject
+- description: The name of the OpenShift Service exposed for this application.
+  displayName: Fabricstore Service Name
+  name: FABRICSTORE_SERVICE_NAME
+  required: true
+  value: fabricstore
 - name: PORT
   displayName: Fabricstore Port
   description: Port at which the Fabricstore service will be listening.
   value: "8080"
+- name: MYSQL_SERVICE_NAME
+  displayName: mysql service name
+  description: Name of the required mysql DB service in Openshift. You can set this only, instead of all individual parameters host, port, user ...
+  value: "mysql"
 - name: MYSQL_DB_HOST
   displayName: mysql database host name
   description: name of host running the mysql DB
