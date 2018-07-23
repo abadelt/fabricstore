@@ -6,11 +6,7 @@ def templateName = 'fabricstore-template'
 // and "openshift" directive/closure from the OpenShift Client Plugin for Jenkins.  Otherwise, the declarative pipeline engine
 // will not be fully engaged.
 pipeline {
-    agent {
-        node {
-            // label 'java'
-        }
-    }
+    agent any
     options {
         // set a timeout of 10 minutes for this pipeline
         timeout(time: 10, unit: 'MINUTES')
@@ -66,6 +62,11 @@ pipeline {
                                 return (it.object().status.phase == "Complete")
                             }
                         }
+                    }
+                    try {
+                        sh 'gradle clean test'
+                    } finally {
+                        junit 'build/test-results/test/TEST-*.xml'
                     }
                 } // script
             } // steps

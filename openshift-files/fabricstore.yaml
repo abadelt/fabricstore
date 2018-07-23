@@ -1,7 +1,7 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  template: fabricstore-template
+  template: fabricstore
 message: |-
   The following service(s) have been created in your project: ${FABRICSTORE_SERVICE_NAME}.
 
@@ -25,7 +25,9 @@ objects:
 - kind: ImageStream
   apiVersion: v1
   metadata:
-    name: fabricstore
+    labels:
+      app: ${FABRICSTORE_SERVICE_NAME}
+    name: ${FABRICSTORE_SERVICE_NAME}
     annotations:
       openshift.io/display-name: fabricstore
   spec:
@@ -47,7 +49,9 @@ objects:
       app: ${FABRICSTORE_SERVICE_NAME}
     name: ${FABRICSTORE_SERVICE_NAME}
   spec:
-    postCommit: {}
+    postCommit: {
+      script: "gradle exec rake test --verbose"
+    }
     resources: {}
     runPolicy: Serial
     source:
