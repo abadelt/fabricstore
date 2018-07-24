@@ -18,8 +18,8 @@ spec:
                 ENVIRONMENT = 'dev'
             }
             options {
-                // set a timeout of 5 minutes for this pipeline
-                timeout(time: 5, unit: 'MINUTES')
+                // set a timeout of 10 minutes for this pipeline
+                timeout(time: 10, unit: 'MINUTES')
             }
 
             stages {
@@ -73,8 +73,12 @@ spec:
                                         return false
                                     } else {
                                         builds.untilEach(1) {
-                                            echo "Build status for ${it.name()} is ${it.object().status.phase}"
-                                            return (it.object().status.phase == "Complete")
+                                            def phase = it.object().status.phase
+                                            echo "Build status for ${it.name()} is ${phase}"
+                                            if (phase == "Failed") {
+                                                error("Build failed !!!")
+                                            }
+                                            return (phase == "Complete")
                                         }
                                     }
                                     junit 'build/test-results/test/TEST-*.xml'
