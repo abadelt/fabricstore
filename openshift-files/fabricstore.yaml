@@ -50,7 +50,7 @@ objects:
     name: ${FABRICSTORE_SERVICE_NAME}
   spec:
     postCommit: {
-      script: "gradle exec rake test --verbose"
+      script: "gradle test"
     }
     resources: {}
     runPolicy: Serial

@@ -1,15 +1,13 @@
-// path of the template to use
 def templatePath = 'https://raw.githubusercontent.com/abadelt/fabricstore/master/openshift-files/fabricstore.yaml'
-// name of the template that will be created
-def templateName = 'fabricstore-template'
-// NOTE, the "pipeline" directive/closure from the declarative pipeline syntax needs to include, or be nested outside,
-// and "openshift" directive/closure from the OpenShift Client Plugin for Jenkins.  Otherwise, the declarative pipeline engine
-// will not be fully engaged.
+def templateName = 'fabricstore'
 pipeline {
     agent any
+    environment {
+        ENVIRONMENT = 'dev'
+    }
     options {
-        // set a timeout of 10 minutes for this pipeline
-        timeout(time: 10, unit: 'MINUTES')
+        // set a timeout of 5 minutes for this pipeline
+        timeout(time: 5, unit: 'MINUTES')
     }
 
     stages {
@@ -30,7 +28,7 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject() {
                             // delete everything with this template label
-                            openshift.selector("all", [ template : templateName ]).delete()
+                            openshift.selector("all", [template: templateName]).delete()
                             // delete any secrets with this template label
                             if (openshift.selector("secrets", templateName).exists()) {
                                 openshift.selector("secrets", templateName).delete()
@@ -58,15 +56,21 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject() {
                             def builds = openshift.selector("bc", templateName).related('builds')
-                            builds.untilEach(1) {
-                                return (it.object().status.phase == "Complete")
+                            echo "Builds size is: ${builds.count()}"
+                            if (builds.count() == 0) {
+                                return false
+                            } else {
+                                builds.untilEach(1) {
+                                    echo "Build status for ${it.name()} is ${it.object().status.phase}"
+                                    return (it.object().status.phase == "Complete")
+                                }
+                            }
+                            try {
+                                sh 'gradle clean test'
+                            } finally {
+                                junit 'build/test-results/test/TEST-*.xml'
                             }
                         }
-                    }
-                    try {
-                        sh 'gradle clean test'
-                    } finally {
-                        junit 'build/test-results/test/TEST-*.xml'
                     }
                 } // script
             } // steps
@@ -76,9 +80,17 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject() {
-                            def rm = openshift.selector("dc", templateName).rollout()
-                            openshift.selector("dc", templateName).related('pods').untilEach(1) {
-                                return (it.object().status.phase == "Running")
+                            // def rolloutMgr =
+                            openshift.selector("dc", templateName).rollout()
+                            def deployments = openshift.selector("dc", templateName).related('pods')
+                            echo "Deployments size is: ${deployments.count()}"
+                            if (deployments.count() == 0) {
+                                return false
+                            } else {
+                                deployments.untilEach(1) {
+                                    echo "Deployments status for ${it.name()} is ${it.object().status.phase}"
+                                    return (it.object().status.phase == "Running")
+                                }
                             }
                         }
                     }
