@@ -49,8 +49,7 @@ objects:
       app: ${FABRICSTORE_SERVICE_NAME}
     name: ${FABRICSTORE_SERVICE_NAME}
   spec:
-    postCommit:
-      script: cd source && gradle test
+    postCommit: {}
     resources: {}
     runPolicy: Serial
     source:
