@@ -28,9 +28,14 @@ repositories {
 plugins {
     kotlin("jvm") version "1.2.51"
     kotlin("plugin.spring") version "1.2.51"
+    id("org.jetbrains.kotlin.plugin.noarg") version "1.2.51"
     id("org.springframework.boot") version "2.0.3.RELEASE"
     id("io.spring.dependency-management") version "1.0.5.RELEASE"
     id("org.unbroken-dome.test-sets") version "1.5.0"
+}
+
+noArg {
+    annotation("javax.persistence.Entity")
 }
 
 tasks.withType<KotlinCompile> {

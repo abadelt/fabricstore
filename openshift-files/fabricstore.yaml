@@ -15,9 +15,6 @@ metadata:
     iconClass: icon-openjdk
     openshift.io/display-name: Fabricstore
     openshift.io/documentation-url: https://github.com/abadelt/fabricstore/
-    openshift.io/long-description:
-    openshift.io/provider-display-name:
-    openshift.io/support-url:
     tags: mosaic9,tailor,fabricstore
   name: fabricstore
 objects:

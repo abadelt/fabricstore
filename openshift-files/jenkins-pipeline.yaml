@@ -81,7 +81,10 @@ spec:
                                             return (phase == "Complete")
                                         }
                                     }
-                                    junit 'build/test-results/test/TEST-*.xml'
+                                    sh 'echo `pwd`'
+                                    sh 'echo `ls -al`'
+                                    sh 'gradle test'
+                                    junit '**/test-results/test/TEST-*.xml'
                                 }
                             }
                         } // script
