@@ -13,14 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.net.URI
 
 @RestController
-class FileContentController {
-
-    private var mongoTemplate: MongoTemplate? = null
-
-    @Autowired
-    fun TemplateRepositoryImpl(mongoTemplate: MongoTemplate) {
-        this.mongoTemplate = mongoTemplate
-    }
+class FileContentController (@Autowired val mongoTemplate: MongoTemplate) {
 
     @PutMapping("/templates/{id}/content", consumes = arrayOf("multipart/form-data"))
     fun uploadFileContent(@PathVariable("id") id: String, @RequestParam("content") content: MultipartFile): ResponseEntity<Template> {

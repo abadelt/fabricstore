@@ -11,12 +11,14 @@
         <header style="display: table-row;">
             <div style="display: table-cell;">Template Name</div>
             <div style="display: table-cell;">Description</div>
+            <div style="display: table-cell;">Version</div>
             <div style="display: table-cell;">Created</div>
             <div style="display: table-cell;">Mime Type</div>
         </header>
         <div style="display: table-row;" ng-repeat="template in templatesList.templates">
             <div style="display: table-cell;"><a href="{{templatesList.getHref(template)}}" type={{template.mimeType}} download={{template.fileName}}>{{template.fileName}}</a></div>
             <div style="display: table-cell;"><label>{{template.description}}</label></div>
+            <div style="display: table-cell;"><label>{{template.version}}</label></div>
             <div style="display: table-cell;"><label>{{template.created}}</label></div>
             <div style="display: table-cell;"><label>{{template.mimeType}}</label></div>
         </div>

@@ -8,7 +8,8 @@ data class Template(
     val fileName: String,
     var content: String = "<html><!-- empty --></html>",
     val description: String = "",
-    val version: Int = 1,
+    var version: Int = 1,
+    var latest: Boolean = false,
     val created: Date = Date(),
     var mimeType: String = "text/html",
     @Transient val _links: TemplateLinks? = null

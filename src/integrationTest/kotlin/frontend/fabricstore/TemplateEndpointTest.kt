@@ -24,22 +24,29 @@ internal class TemplateEndpointTest {
     @Autowired
     lateinit var testRestTemplate: TestRestTemplate
 
+    val timeMillis = System.currentTimeMillis() // to make template names unique
+
     val templateA = Template(
         null,
-        "templateA.html",
-        "<html><body>1</body></html>",
-        "desc 1",
-        1
+        "templateA-" + timeMillis + ".html",
+        "<html><body>A</body></html>",
+        "desc A"
     )
     var templateA_URI: String? = null
     val templateB = Template(
         null,
-        "templateB.html",
-        "<html><body>2</body></html>",
-        "desc 1",
-        1
+        "templateB-" + timeMillis + ".html",
+        "<html><body>B</body></html>",
+        "desc B"
     )
     var templateB_URI: String? = null
+    val templateB2 = Template(
+        null,
+        "templateB-" + timeMillis + ".html",
+        "<html><body>B 2</body></html>",
+        "desc B 2"
+    )
+    var templateB2_URI: String? = null
 
     var totalExpectedCount: Int = 0
 
@@ -58,7 +65,11 @@ internal class TemplateEndpointTest {
         assertEquals(HttpStatus.CREATED, result.statusCode)
         templateB_URI = discoverer.findLinkWithRel("self", result.body).href
 
-        totalExpectedCount += 2
+        result = testRestTemplate.postForEntity("/templates", templateB2, String::class.java)
+        assertEquals(HttpStatus.CREATED, result.statusCode)
+        templateB2_URI = discoverer.findLinkWithRel("self", result.body).href
+
+        totalExpectedCount += 2 // increase only by 2, as B and B2 are only different versions of same template
     }
 
     @Test
