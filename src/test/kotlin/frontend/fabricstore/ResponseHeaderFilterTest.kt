@@ -1,7 +1,7 @@
 package frontend.fabricstore
 
+import frontend.fabricstore.http.ResponseHeaderFilter
 import org.junit.jupiter.api.Assertions.*
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.mock.web.MockFilterChain
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse

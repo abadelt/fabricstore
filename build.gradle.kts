@@ -57,11 +57,8 @@ dependencies {
     compile(kotlin("reflect", kotlinVersion))
     compile("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     compile("org.springframework.boot:spring-boot-starter-data-rest:$springBootVersion")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion")
-    compile("mysql:mysql-connector-java")
-    compile("com.github.paulcwarren:spring-content-fs-boot-starter:0.1.0")
-    compile("com.github.paulcwarren:spring-content-rest-boot-starter:0.1.0")
-    testCompile("com.h2database:h2")
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
+    compile("commons-fileupload:commons-fileupload:1.3.3")
     testCompile("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
     testCompile(kotlin("test"))
     testCompile("org.junit.jupiter:junit-jupiter-api:$junitVersion")
@@ -69,22 +66,23 @@ dependencies {
 }
 
 
-val mysqlDbHost = System.getenv("MYSQL_DB_HOST") ?: "mysql"
-val mysqlDbPort = System.getenv("MYSQL_DB_PORT") ?: "3306"
-val mysqlDbName = System.getenv("MYSQL_DB_NAME") ?: "mysqldb"
-val mysqlUser = System.getenv("MYSQL_USER") ?: "mysql"
-val mysqlPassword = System.getenv("MYSQL_PASSWORD") ?: "mysql"
-val mySQLProperties = mapOf(
-    "mysqlDbHost" to mysqlDbHost,
-    "mysqlDbPort" to mysqlDbPort,
-    "mysqlDbName" to mysqlDbName,
-    "mysqlUser" to mysqlUser,
-    "mysqlPassword" to mysqlPassword
+val dbHost = System.getenv("DB_HOST") ?: "localhost"
+val dbPort = System.getenv("DB_PORT") ?: 27017
+val dbName = System.getenv("DB_NAME") ?: "templates"
+val dbUser = System.getenv("DB_USER") ?: "mongo"
+val dbPassword = System.getenv("DB_PASSWORD") ?: "mongo"
+
+val dbProperties = mapOf(
+    "dbHost" to dbHost,
+    "dbPort" to dbPort,
+    "dbName" to dbName,
+    "dbUser" to dbUser,
+    "dbPassword" to dbPassword
 )
 
 tasks.withType<ProcessResources> {
     filesMatching("application.properties") {
-        expand(mySQLProperties)
+        expand(dbProperties)
     }
     onlyIf { file("src/main/resources/application.properties").exists() }
 }
@@ -104,3 +102,13 @@ tasks.withType<Test> {
     }
 }
 
+val webpack by tasks.creating(Exec::class) {
+    commandLine("webpack")
+}
+/*
+"src/main/resources/static/js/angular.min.js", "src/main/resources/static/js/templates.js", "$buildDir/resources/main/staticjs/bundle.js")
+
+task webpack(type: Exec) {
+    commandLine "$projectDir/node_modules/.bin/webpack", "src/main/resources/*.js", "$buildDir/resources/main/staticjs/bundle.js"
+}
+*/

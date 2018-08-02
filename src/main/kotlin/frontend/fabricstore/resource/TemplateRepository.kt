@@ -1,9 +1,8 @@
 package frontend.fabricstore.resource
 
 import frontend.fabricstore.model.Template
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.rest.core.annotation.RepositoryRestResource
+import org.springframework.data.mongodb.repository.MongoRepository
 
-@RepositoryRestResource(path="templates", collectionResourceRel="templates")
-interface TemplateRepository : JpaRepository<Template, Long> {
+interface TemplateRepository : MongoRepository<Template, String> {
+
 }
