@@ -58,7 +58,7 @@ objects:
         from:
           kind: ImageStreamTag
           name: s2i-java:latest
-          namespace: frontend-sandbox
+          namespace: ${PROJECT}
       type: Source
     output:
       to:
@@ -145,7 +145,7 @@ objects:
         from:
           kind: ImageStreamTag
           name: ${FABRICSTORE_SERVICE_NAME}:latest
-          namespace: frontend-sandbox
+          namespace: ${PROJECT}
       type: ImageChange
 
 - kind: Service
@@ -173,7 +173,7 @@ objects:
       app: ${FABRICSTORE_SERVICE_NAME}
     name: ${FABRICSTORE_SERVICE_NAME}
   spec:
-    host: ${FABRICSTORE_SERVICE_NAME}-frontend-sandbox.apps.badelt.it
+    host: ${FABRICSTORE_SERVICE_NAME}-${PROJECT}.${EXTERNAL_DOMAIN_NAME}
     port:
       targetPort: ${PORT}-tcp
     to:
@@ -187,6 +187,10 @@ parameters:
   displayName: Project (= namespace) name
   description: Name of the project in which the created resources and referenced ImageStreams reside.
   value: myproject
+- name: EXTERNAL_DOMAIN_NAME
+  displayName: External domain name for the app - e.g. for routes
+  description: External domain name under which this app should be reachable - e.g. caas1.domain.com
+  value: caas1.domain.com
 - description: The name of the OpenShift Service exposed for this application.
   displayName: Fabricstore Service Name
   name: FABRICSTORE_SERVICE_NAME
@@ -196,27 +200,23 @@ parameters:
   displayName: Fabricstore Port
   description: Port at which the Fabricstore service will be listening.
   value: "8080"
-- name: MYSQL_SERVICE_NAME
-  displayName: mysql service name
-  description: Name of the required mysql DB service in Openshift. You can set this only, instead of all individual parameters host, port, user ...
-  value: "mysql"
-- name: MYSQL_DB_HOST
-  displayName: mysql database host name
-  description: name of host running the mysql DB
-  value: "mysql"
-- name: MYSQL_DB_PORT
-  displayName: mysql database port
-  description: port the mysql DB is listening on
-  value: "3306"
-- name: MYSQL_DB_NAME
-  displayName: mysql database name
-  description: database name of the mysql DB used by Fabricstore
-  value: "mysqldb"
-- name: MYSQL_USER
-  displayName: mysql database user name
-  description: user name to access the mysql DB
-  value: "mysql"
-- name: MYSQL_PASSWORD
-  displayName: mysql database password
-  description: password to access the mysql DB
-  value: "mysql"
+- name: DB_HOST
+  displayName: mongodb database host name
+  description: name of host running the mongodb DB
+  value: "mongodb"
+- name: DB_PORT
+  displayName: mongodb database port
+  description: port the mongodb DB is listening on
+  value: "27017"
+- name: DB_NAME
+  displayName: mongodb database name
+  description: database name of the mongodb DB used by Fabricstore
+  value: "templates"
+- name: DB_USER
+  displayName: mongodb database user name
+  description: user name to access the mongodb DB
+  value: "mongo"
+- name: DB_PASSWORD
+  displayName: mongodb database password
+  description: password to access the mongodb DB
+  value: "db"
